@@ -15,6 +15,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#include <inttypes.h>
+#include <stdbool.h>
+
+enum taps {
+    TAP_COUNT = 0,
+    TAP_MF1_4,
+    TAP_MF5_8,
+    TAP_MF9_12,
+    TAP_MF13_16,
+};
+
+typedef struct {
+    uint8_t   size;
+    uint16_t *keycodes;
+} qk_tap_dance_n_role_t;
+
+void qk_tap_dance_n_finished(qk_tap_dance_state_t *state, void *user_data) {
+    qk_tap_dance_n_role_t *data = (qk_tap_dance_n_role_t *)user_data;
+
+    uint8_t count = state->count;
+    if (count > data->size) count = data->size;
+
+    tap_code16(data->keycodes[count - 1]);
+};
+
+#define ACTION_TAP_DANCE_N(size_n, ...) \
+    { .fn = {NULL, qk_tap_dance_n_finished, NULL}, .user_data = (void *)&((qk_tap_dance_n_role_t){.size = size_n, .keycodes = (uint16_t[]){__VA_ARGS__}}) }
+
+// clang-format off
+qk_tap_dance_action_t tap_dance_actions[] = {
+    [TAP_COUNT] = ACTION_TAP_DANCE_N(4, KC_1, KC_2, KC_3, KC_4),
+    [TAP_MF1_4] = ACTION_TAP_DANCE_N(4, MEH(KC_F1), MEH(KC_F2), MEH(KC_F3), MEH(KC_F4)),
+    [TAP_MF5_8] = ACTION_TAP_DANCE_N(4, MEH(KC_F5), MEH(KC_F6), MEH(KC_F7), MEH(KC_F8)),
+    [TAP_MF9_12] = ACTION_TAP_DANCE_N(4, MEH(KC_F9), MEH(KC_F10), MEH(KC_F11), MEH(KC_F12)),
+    [TAP_MF13_16] = ACTION_TAP_DANCE_N(4, MEH(KC_F13), MEH(KC_F14), MEH(KC_F15), MEH(KC_F16))
+};
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -39,11 +75,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Since this is, among other things, a "gaming" keyboard, a key combination to enable NKRO on the fly is provided for convenience.
     // Press Fn+N to toggle between 6KRO and NKRO. This setting is persisted to the EEPROM and thus persists between restarts.
     [0] = LAYOUT(
-        KC_ESC,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_PSCR,          KC_MUTE,
-        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC,          MEH(KC_F1),
-        KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS,          MEH(KC_F2),
-        KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,           MEH(KC_F3),
-        KC_LSPO,          KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,          KC_RSPC, KC_UP,   MEH(KC_F4),
+        KC_ESC,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  TD(TAP_COUNT),    LCTL(KC_UP),
+        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC,          TD(TAP_MF1_4),
+        KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS,          TD(TAP_MF5_8),
+        KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,           TD(TAP_MF9_12),
+        KC_LSPO,          KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,          KC_RSPC, KC_UP,   TD(TAP_MF13_16),
         KC_LCTL, KC_LGUI, KC_LALT,                            KC_SPC,                             KC_MEH , MO(1),   KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
 
@@ -61,5 +97,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 #if defined(ENCODER_MAP_ENABLE)
-const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {[0] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU)}, [1] = {ENCODER_CCW_CW(KC_TRNS, KC_TRNS)}};
+// clang-format off
+const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
+    [0] = { ENCODER_CCW_CW(LCTL(KC_LEFT), LCTL(KC_RIGHT))},
+    [1] = { ENCODER_CCW_CW(KC_TRNS, KC_TRNS)}
+};
 #endif
