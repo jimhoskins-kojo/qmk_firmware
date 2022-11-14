@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 #include <inttypes.h>
 #include <stdbool.h>
+#include "jimrhoskins.h"
 
 enum taps {
     TAP_COUNT = 0,
@@ -25,23 +26,6 @@ enum taps {
     TAP_MF9_12,
     TAP_MF13_16,
 };
-
-typedef struct {
-    uint8_t   size;
-    uint16_t *keycodes;
-} qk_tap_dance_n_role_t;
-
-void qk_tap_dance_n_finished(qk_tap_dance_state_t *state, void *user_data) {
-    qk_tap_dance_n_role_t *data = (qk_tap_dance_n_role_t *)user_data;
-
-    uint8_t count = state->count;
-    if (count > data->size) count = data->size;
-
-    tap_code16(data->keycodes[count - 1]);
-};
-
-#define ACTION_TAP_DANCE_N(size_n, ...) \
-    { .fn = {NULL, qk_tap_dance_n_finished, NULL}, .user_data = (void *)&((qk_tap_dance_n_role_t){.size = size_n, .keycodes = (uint16_t[]){__VA_ARGS__}}) }
 
 // clang-format off
 qk_tap_dance_action_t tap_dance_actions[] = {
