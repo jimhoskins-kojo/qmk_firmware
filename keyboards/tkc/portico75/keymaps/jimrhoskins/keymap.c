@@ -52,3 +52,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,   AG_NORM,   AG_SWAP,                _______,                           _______,   _______,                     _______,   RGB_RMOD,  _______
     )
 };
+
+#if defined(ENCODER_MAP_ENABLE)
+// clang-format off
+const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
+    [0] = { ENCODER_CCW_CW(LCTL(KC_LEFT), LCTL(KC_RIGHT))},
+    [1] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)}
+};
+#endif
