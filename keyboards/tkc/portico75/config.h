@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*Rotary Encoder Pins*/
 #define ENCODERS_PAD_A \
-    { B1 }
-#define ENCODERS_PAD_B \
     { B2 }
+#define ENCODERS_PAD_B \
+    { B1 }
 
 /*Sets the number of pulses per increment*/
 #define ENCODER_RESOLUTION 2
@@ -67,7 +67,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define ENABLE_RGB_MATRIX_RAINBOW_MOVING_CHEVRON
 #    define ENABLE_RGB_MATRIX_CYCLE_OUT_IN
 #    define ENABLE_RGB_MATRIX_CYCLE_OUT_IN_DUAL
-#    define ENABLE_RGB_MATRIX_CYCLE_PINWHEEL
+//#    define ENABLE_RGB_MATRIX_CYCLE_PINWHEEL
 #    define ENABLE_RGB_MATRIX_CYCLE_SPIRAL
 #    define ENABLE_RGB_MATRIX_DUAL_BEACON
 #    define ENABLE_RGB_MATRIX_RAINBOW_BEACON
